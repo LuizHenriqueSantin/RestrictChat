@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, TextField, IconButton } from "@mui/material";
+import { Box, TextField, IconButton, CircularProgress, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { useChatStore } from "../../store/chatStore";
 
@@ -16,31 +16,36 @@ export default function MessageInput({ onSend }) {
   return (
     <Box
       sx={{
-        height: 72,
         flexShrink: 0,
         px: 2,
+        pt: 1,
+        pb: isPending ? 0.5 : 1,
         borderTop: 1,
         borderColor: "divider",
-        display: "flex",
-        gap: 1,
-        alignItems: "center",
       }}
     >
-      <TextField
-        fullWidth
-        size="small"
-        placeholder="Digite uma mensagem..."
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-      />
-      <IconButton
-        color="primary"
-        onClick={handleSend}
-        disabled={!content.trim() || isPending}
-      >
-        <SendIcon />
-      </IconButton>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <TextField
+          fullWidth
+          size="small"
+          placeholder="Digite uma mensagem..."
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+        />
+        <IconButton
+          color="primary"
+          onClick={handleSend}
+          disabled={!content.trim() || isPending}
+        >
+          {isPending ? <CircularProgress size={20} color="primary" /> : <SendIcon />}
+        </IconButton>
+      </Box>
+      {isPending && (
+        <Typography variant="caption" color="text.secondary" sx={{ pl: 0.5 }}>
+          Validando mensagem...
+        </Typography>
+      )}
     </Box>
   );
 }

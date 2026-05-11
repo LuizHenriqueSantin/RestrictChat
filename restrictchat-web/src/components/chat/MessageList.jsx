@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import MessageItem from "./MessageItem";
-import PendingIndicator from "./PendingIndicator";
 import { useChatStore } from "../../store/chatStore";
 
 export default function MessageList() {
-  const { messages, isPending } = useChatStore();
+  const { messages } = useChatStore();
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -17,7 +16,6 @@ export default function MessageList() {
       {messages.map((msg) => (
         <MessageItem key={msg.id} message={msg} />
       ))}
-      {isPending && <PendingIndicator />}
       <div ref={bottomRef} />
     </Box>
   );
