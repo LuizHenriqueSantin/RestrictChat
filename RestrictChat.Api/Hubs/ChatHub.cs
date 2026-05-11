@@ -30,8 +30,16 @@ public class ChatHub(
 
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
 
-        var history = await messageRepository.GetHistoryAsync(roomId, 50, null, CancellationToken.None);
-        await Clients.Caller.SendAsync("RoomHistory", history);
+        try
+        {
+            var history = await messageRepository.GetHistoryAsync(roomId, 50, null, CancellationToken.None);
+            await Clients.Caller.SendAsync("RoomHistory", history);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao buscar histórico do MongoDB para sala {RoomId}", roomId);
+            await Clients.Caller.SendAsync("RoomHistory", new List<object>());
+        }
     }
 
     public async Task SubscribeToRoom(Guid roomId)
