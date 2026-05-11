@@ -64,7 +64,8 @@ public class Program
             app.MapOpenApi();
 
         app.UseCors("Frontend");
-        app.UseHttpsRedirection();
+        if (app.Environment.IsDevelopment())
+            app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
 
