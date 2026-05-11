@@ -10,7 +10,7 @@ export default function MessageList() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isPending]);
+  }, [messages]);
 
   return (
     <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>

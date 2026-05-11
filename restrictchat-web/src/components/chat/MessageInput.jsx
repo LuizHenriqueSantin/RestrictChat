@@ -33,7 +33,6 @@ export default function MessageInput({ onSend }) {
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-        disabled={isPending}
       />
       <IconButton
         color="primary"
