@@ -18,10 +18,12 @@ export default function MessageInput({ onSend }) {
       sx={{
         flexShrink: 0,
         px: 2,
-        pt: 1,
-        pb: isPending ? 0.5 : 1,
+        py: 1,
         borderTop: 1,
         borderColor: "divider",
+        display: "flex",
+        flexDirection: "column",
+        gap: 0.5,
       }}
     >
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
@@ -41,11 +43,13 @@ export default function MessageInput({ onSend }) {
           {isPending ? <CircularProgress size={20} color="primary" /> : <SendIcon />}
         </IconButton>
       </Box>
-      {isPending && (
-        <Typography variant="caption" color="text.secondary" sx={{ pl: 0.5 }}>
-          Validando mensagem...
-        </Typography>
-      )}
+      <Typography
+        variant="caption"
+        color="primary"
+        sx={{ pl: 0.5, height: 16, visibility: isPending ? "visible" : "hidden" }}
+      >
+        Validando mensagem...
+      </Typography>
     </Box>
   );
 }
