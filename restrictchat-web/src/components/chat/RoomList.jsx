@@ -108,7 +108,7 @@ export default function RoomList({ rooms, onRoomCreated }) {
 
       <Box
         sx={{
-          height: 72,
+          height: 73,
           flexShrink: 0,
           px: 2,
           borderTop: 1,
