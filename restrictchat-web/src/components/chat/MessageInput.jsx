@@ -23,7 +23,6 @@ export default function MessageInput({ onSend }) {
         borderColor: "divider",
         display: "flex",
         flexDirection: "column",
-        gap: 0.5,
       }}
     >
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
