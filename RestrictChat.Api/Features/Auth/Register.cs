@@ -1,12 +1,13 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using RestrictChat.Api.Common.Extensions;
 using RestrictChat.Api.Infrastructure.Postgres;
 using RestrictChat.Api.Infrastructure.Postgres.Entities;
 
 namespace RestrictChat.Api.Features.Auth;
 
 public record RegisterRequest(string Username, string Email, string Password);
-public record RegisterResponse(Guid Id, string Username, string Email);
+public record RegisterResponse(Guid Id, string Username, string Email, string Token);
 
 public class RegisterValidator : AbstractValidator<RegisterRequest>
 {
@@ -30,7 +31,7 @@ public class RegisterValidator : AbstractValidator<RegisterRequest>
     }
 }
 
-public class RegisterHandler(AppDbContext db)
+public class RegisterHandler(AppDbContext db, TokenService tokenService)
 {
     public async Task<RegisterResponse> Handle(RegisterRequest req, CancellationToken ct)
     {
@@ -49,7 +50,9 @@ public class RegisterHandler(AppDbContext db)
         db.Users.Add(user);
         await db.SaveChangesAsync(ct);
 
-        return new RegisterResponse(user.Id, user.Username, user.Email);
+        var token = tokenService.Generate(user);
+
+        return new RegisterResponse(user.Id, user.Username, user.Email, token);
     }
 }
 
@@ -70,7 +73,7 @@ public static class RegisterEndpoint
             try
             {
                 var response = await handler.Handle(req, ct);
-                return Results.Created($"/users/{response.Id}", response);
+                return Results.Ok(response);
             }
             catch (InvalidOperationException ex)
             {
