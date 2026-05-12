@@ -20,6 +20,9 @@ public class MessageRepository
         _collection.Indexes.CreateOne(new CreateIndexModel<Message>(indexKey));
     }
 
+    public async Task DeleteByRoomAsync(Guid roomId, CancellationToken ct) =>
+        await _collection.DeleteManyAsync(m => m.RoomId == roomId, ct);
+
     public async Task InsertAsync(Message message, CancellationToken ct) =>
         await _collection.InsertOneAsync(message, cancellationToken: ct);
 

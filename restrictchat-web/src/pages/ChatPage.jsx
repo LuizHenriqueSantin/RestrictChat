@@ -7,15 +7,22 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import DeleteIcon from "@mui/icons-material/Delete";
 import RoomList from "../components/chat/RoomList";
 import MessageList from "../components/chat/MessageList";
 import MessageInput from "../components/chat/MessageInput";
 import AddMemberModal from "../components/chat/AddMemberModal";
 import MembersModal from "../components/chat/MembersModal";
-import { getRooms } from "../api/rooms";
+import { getRooms, deleteRoom } from "../api/rooms";
 import { useSignalR } from "../hooks/useSignalR";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
@@ -24,7 +31,9 @@ export default function ChatPage() {
   const [rooms, setRooms] = useState([]);
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
-  const { selectedRoom } = useChatStore();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const { selectedRoom, setSelectedRoom } = useChatStore();
   const { sendMessage, subscribeToRooms, rejectedMessage, clearRejected } =
     useSignalR();
   const user = useAuthStore((state) => state.user);
@@ -40,6 +49,18 @@ export default function ChatPage() {
   }, []);
 
   const isOwner = selectedRoom && user && selectedRoom.ownerId === user.id;
+
+  const handleDeleteRoom = async () => {
+    setDeleting(true);
+    try {
+      await deleteRoom(selectedRoom.id);
+      setDeleteOpen(false);
+      setSelectedRoom(null);
+      fetchRooms();
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <Box
@@ -74,13 +95,26 @@ export default function ChatPage() {
               position: "relative",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
+            {isOwner && (
+              <Tooltip title="Excluir sala">
+                <IconButton
+                  onClick={() => setDeleteOpen(true)}
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    left: 16,
+                    border: "1px solid",
+                    borderColor: "error.main",
+                    borderRadius: 1,
+                    color: "error.main",
+                    "&:hover": { borderColor: "error.dark", color: "error.dark" },
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <Typography variant="h6" fontWeight="bold" color="primary">
                 {selectedRoom.name}
               </Typography>
@@ -100,10 +134,7 @@ export default function ChatPage() {
                     borderColor: "primary.main",
                     borderRadius: 1,
                     color: "primary.main",
-                    "&:hover": {
-                      borderColor: "primary.light",
-                      color: "primary.light",
-                    },
+                    "&:hover": { borderColor: "primary.light", color: "primary.light" },
                   }}
                 >
                   <PersonAddIcon fontSize="small" />
@@ -121,10 +152,7 @@ export default function ChatPage() {
                   borderColor: "primary.main",
                   borderRadius: 1,
                   color: "primary.main",
-                  "&:hover": {
-                    borderColor: "primary.light",
-                    color: "primary.light",
-                  },
+                  "&:hover": { borderColor: "primary.light", color: "primary.light" },
                 }}
               >
                 <GroupIcon fontSize="small" />
@@ -148,19 +176,27 @@ export default function ChatPage() {
           />
         </Box>
       ) : (
-        <Box
-          sx={{
-            display: "flex",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <Box sx={{ display: "flex", flex: 1, alignItems: "center", justifyContent: "center" }}>
           <Typography color="text.secondary">
             Selecione uma sala para começar a conversar
           </Typography>
         </Box>
       )}
+
+      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
+        <DialogTitle>Excluir sala</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Tem certeza que deseja excluir <strong>{selectedRoom?.name}</strong>? Todo o histórico de mensagens será perdido permanentemente.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteOpen(false)}>Cancelar</Button>
+          <Button onClick={handleDeleteRoom} color="error" variant="contained" disabled={deleting}>
+            Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={!!rejectedMessage}

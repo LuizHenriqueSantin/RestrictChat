@@ -43,6 +43,7 @@ public class Program
         builder.Services.AddScoped<LoginHandler>();
         builder.Services.AddScoped<LoginValidator>();
 
+        builder.Services.AddScoped<DeleteRoomHandler>();
         builder.Services.AddScoped<CreateRoomHandler>();
         builder.Services.AddScoped<CreateRoomValidator>();
         builder.Services.AddScoped<GetRoomsHandler>();
@@ -78,6 +79,7 @@ public class Program
         RegisterEndpoint.Map(app);
         LoginEndpoint.Map(app);
 
+        DeleteRoomEndpoint.Map(app);
         CreateRoomEndpoint.Map(app);
         GetRoomsEndpoint.Map(app);
         GetMembersEndpoint.Map(app);
